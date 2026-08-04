@@ -1,86 +1,188 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller;
 
+import dao.UserDAO;
 import java.io.IOException;
-import java.io.PrintWriter;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import model.User;
 
-/**
- *
- * @author ASUS
- */
+
 public class loginservlet extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+
+    protected void processRequest(HttpServletRequest request,
+            HttpServletResponse response)
             throws ServletException, IOException {
+
+
+        // Response Object
         response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet loginservlet</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet loginservlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+
+
+        try {
+
+            // Request Object
+            String username = request.getParameter("usr");
+            String password = request.getParameter("pswd");
+
+
+            // Calling DAO
+            UserDAO dao = new UserDAO();
+
+            User myuser = dao.login(username, password);
+
+
+            if(myuser != null)
+            {
+
+                // ----------------------------
+                // Session Object
+                // ----------------------------
+                HttpSession session = request.getSession();
+
+                session.setAttribute("myusr",
+                        myuser.getUsername());
+
+                session.setAttribute("mypassword",
+                        myuser.getPassword());
+
+
+
+                // ----------------------------
+                // Application Object
+                // ServletContext
+                // Count visitors
+                // ----------------------------
+
+                ServletContext application =
+                        getServletContext();
+
+
+                Integer count =
+                    (Integer)application.getAttribute("visitorCount");
+
+
+                if(count == null)
+                {
+                    count = 0;
+                }
+
+
+                count++;
+
+
+                application.setAttribute(
+                        "visitorCount",
+                        count);
+
+
+
+                // ----------------------------
+                // ServletConfig Object
+                // Read course name
+                // ----------------------------
+
+                ServletConfig config =
+                        getServletConfig();
+
+
+                String courseName =
+                    config.getInitParameter("courseName");
+
+
+                request.setAttribute(
+                        "course",
+                        courseName);
+
+
+
+                // Forward to welcome page
+
+                RequestDispatcher rd =
+                    request.getRequestDispatcher("welcome.jsp");
+
+
+                rd.forward(request, response);
+
+
+
+            }
+            else
+            {
+
+                // Invalid login
+
+                request.setAttribute(
+                        "error",
+                        "Invalid Username or Password");
+
+
+                RequestDispatcher rd =
+                    request.getRequestDispatcher("login.jsp");
+
+
+                rd.forward(request,response);
+
+            }
+
+
+
         }
+        catch(Exception e)
+        {
+
+            // Send error page
+
+            request.setAttribute(
+                    "errorMessage",
+                    e.getMessage());
+
+
+            RequestDispatcher rd =
+                    request.getRequestDispatcher("error.jsp");
+
+
+            rd.forward(request,response);
+
+        }
+
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+
+
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(HttpServletRequest request,
+            HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+
+        processRequest(request,response);
+
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+
+
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(HttpServletRequest request,
+            HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+
+        processRequest(request,response);
+
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
+
+
     @Override
     public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+
+        return "Login Servlet with JSP implicit objects demonstration";
+
+    }
 
 }

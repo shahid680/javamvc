@@ -21,13 +21,13 @@ public class loginservlet extends HttpServlet {
             throws ServletException, IOException {
 
 
-        // Response Object
+     
         response.setContentType("text/html;charset=UTF-8");
 
 
         try {
 
-            // Request Object
+            
             String username = request.getParameter("usr");
             String password = request.getParameter("pswd");
 
@@ -41,9 +41,7 @@ public class loginservlet extends HttpServlet {
             if(myuser != null)
             {
 
-                // ----------------------------
-                // Session Object
-                // ----------------------------
+                
                 HttpSession session = request.getSession();
 
                 session.setAttribute("myusr",
@@ -54,11 +52,7 @@ public class loginservlet extends HttpServlet {
 
 
 
-                // ----------------------------
-                // Application Object
-                // ServletContext
-                // Count visitors
-                // ----------------------------
+
 
                 ServletContext application =
                         getServletContext();
@@ -83,10 +77,7 @@ public class loginservlet extends HttpServlet {
 
 
 
-                // ----------------------------
-                // ServletConfig Object
-                // Read course name
-                // ----------------------------
+
 
                 ServletConfig config =
                         getServletConfig();
@@ -102,7 +93,7 @@ public class loginservlet extends HttpServlet {
 
 
 
-                // Forward to welcome page
+
 
                 RequestDispatcher rd =
                     request.getRequestDispatcher("welcome.jsp");
@@ -116,7 +107,7 @@ public class loginservlet extends HttpServlet {
             else
             {
 
-                // Invalid login
+                
 
                 request.setAttribute(
                         "error",
@@ -137,7 +128,7 @@ public class loginservlet extends HttpServlet {
         catch(Exception e)
         {
 
-            // Send error page
+        
 
             request.setAttribute(
                     "errorMessage",
